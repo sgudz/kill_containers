@@ -1,7 +1,6 @@
 namespace=$1
 pod_to_kill=$2
-key_path="/home/ubuntu/child_rsa"
-
+key_path="${RSA_PATH:-"/home/ubuntu/.ssh/openstack_tmp"}"
 if [ "$2" == "all" ]; then
   pods=`kubectl get pods -n $namespace | grep Running | awk '{print $1}'`
 else
@@ -18,7 +17,7 @@ for pod in $pods; do
     shim_pid=$(ssh -i $key_path -o StrictHostKeyChecking=no ubuntu@$node_ip "ps aux | grep $container_id | grep -v grep | awk '{print \$2}'")
     echo "Pod name: $pod"
     echo "Contaiiners in pod: $containers_in_pod"
-    echo "Containers name: $container_name"
+    echo "Container name: $container_name"
     echo "Container ID: $container_id"
     echo "Node name: $node"
     echo "Node ip: $node_ip"
