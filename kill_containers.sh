@@ -1,5 +1,6 @@
 namespace=$1
 pod_to_kill=$2
+key_path="/home/ubuntu/child_rsa"
 
 if [ "$2" == "all" ]; then
   pods=`kubectl get pods -n $namespace | grep Running | awk '{print $1}'`
@@ -14,7 +15,7 @@ for pod in $pods; do
     container_name=`kubectl get pod -n $namespace $pod -o jsonpath="{.status.containerStatuses[$i].name}"`
     node=`kubectl get pod -n $namespace $pod -o wide | awk '/node/ {print $7}'`
     node_ip=`kubectl get node -o wide $node | awk '/node/ {print $7}'`
-    shim_pid=$(ssh -i /home/ubuntu/.ssh/openstack_tmp -o StrictHostKeyChecking=no ubuntu@$node_ip "ps aux | grep $container_id | grep -v grep | awk '{print \$2}'")
+    shim_pid=$(ssh -i $key_path -o StrictHostKeyChecking=no ubuntu@$node_ip "ps aux | grep $container_id | grep -v grep | awk '{print \$2}'")
     echo "Pod name: $pod"
     echo "Contaiiners in pod: $containers_in_pod"
     echo "Containers name: $container_name"
@@ -24,7 +25,7 @@ for pod in $pods; do
     echo "containerd-shim process ID: $shim_pid"
     echo ""
     if [ "$3" == "kill" ]; then
-      ssh -i /home/ubuntu/.ssh/openstack_tmp -o StrictHostKeyChecking=no ubuntu@$node_ip "sudo kill -9 $shim_pid"
+      ssh -i $key_path -o StrictHostKeyChecking=no ubuntu@$node_ip "sudo kill -9 $shim_pid"
       echo "process $shim_pid for container $container_name in $pod pod is killed"
     fi
   done
