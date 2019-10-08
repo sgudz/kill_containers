@@ -28,4 +28,5 @@ for pod in $pods; do
       echo "process $shim_pid for container $container_name in $pod pod is killed"
     fi
   done
+  echo -e "\e[32m################################################\e[0m"
 done
